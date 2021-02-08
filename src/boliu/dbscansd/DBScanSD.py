@@ -2,26 +2,28 @@ from TrajectoryPoint import TrajectoryPoint
 from Cluster import Cluster
 from DBScanUtility import DBScanUtility
 
+from pprint import pprint
+
 
 class DBScanSD():
     def __init__(self):
         self.result_clusters = []
 
-    def apply_DBScanSD(pts_list, eps, min_pts, spd, direc, is_stop_pt):
+    def apply_dbscansd(self, pts_list, eps, min_pts, spd, direc, is_stop_pt):
 
         for i in range(len(pts_list)):
             tmp_list = []
             p = pts_list[i]
 
-            if ((p.is_visited()) and (i != (len(pts_list) - 1))
-                    and (i % 4096 != 0)):
+            pprint(vars(p))
+
+            if ((p.get_is_visited()) and (i != (len(pts_list) - 1)) and (i % 4096 != 0)):
                 continue
             # TODO: is_core_point()
-            tmp_list = core_points(pts_list, eps, min_pts, spd, direc,
-                                   is_stop_pt)
 
-            if ((tmp_list != None) or (i == (len(pts_list) - 1))
-                    or (i % 4096 == 0)):
+            tmp_list = self.core_points(pts_list, p, eps, min_pts, spd, direc, is_stop_pt)
+
+            if ((tmp_list != None) or (i == (len(pts_list) - 1)) or (i % 4096 == 0)):
                 dbsc = Cluster()
                 dbsc.set_cluster(tmp_list)
                 if (tmp_list != None):
@@ -37,7 +39,7 @@ class DBScanSD():
                                     flag = True
                                     continue
                                 # TODO: merge_clusters()
-                                if (merge_clusters(self.result_clusters[ii],
+                                if (self.merge_clusters(self.result_clusters[ii],
                                                    self.result_clusters[iii])):
                                     del self.result_clusters[iii]
                                     iii -= 1
@@ -45,14 +47,14 @@ class DBScanSD():
 
         return self.result_clusters
 
-    def merge_clusters(cluster_a, cluster_b):
+    def merge_clusters(self, cluster_a, cluster_b):
         merge = False
         if ((cluster_a.get_cluster() == None)
                 or (cluster_b.get_cluster() == None)):
             return False
         for i in range(len(cluster_b.get_cluster())):
             p = cluster_b.get_cluster()[i]
-            if ((p.is_core_point()) and (p in cluster_a.get_cluster())):
+            if ((p.get_is_core_point()) and (p in cluster_a.get_cluster())):
                 merge = True
                 break
         if (merge):
@@ -61,13 +63,14 @@ class DBScanSD():
                     cluster_a.get_cluster().append(cluster_b.get_cluster()[i])
         return merge
 
-    def core_points(traj_list, p, eps, min_pts, spd, direc, is_stop_pt):
+    def core_points(self, traj_list, p, eps, min_pts, spd, direc, is_stop_pt):
         cnt = 0
         tmp_list = []
+        dbsu = DBScanUtility()
 
+        # CHECK: iteration in java
         for q in traj_list:
-            if (is_density_reachable(self, p, q, eps, min_pts, spd, direc,
-                                     is_stop_pt)):
+            if (dbsu.is_density_reachable(p, q, eps, min_pts, spd, direc, is_stop_pt)):
                 cnt += 1
                 if (not q in tmp_list):
                     tmp_list.append(q)

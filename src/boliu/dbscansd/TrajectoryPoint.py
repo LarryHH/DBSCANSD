@@ -46,13 +46,13 @@ class TrajectoryPoint():
     def set_timestamp(self, ts):
         self.timestamp = ts
 
-    def is_visited(self):
+    def get_is_visited(self):
         return self.is_visited
     
     def set_visited(self, iv):
         self.is_visited = iv
 
-    def is_core_point(self):
+    def get_is_core_point(self):
         return self.is_core_point
     
     def set_core_point(self, cp):
